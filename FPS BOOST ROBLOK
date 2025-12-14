@@ -1,0 +1,118 @@
+repeat task.wait() until game:IsLoaded()
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local MaterialService = game:GetService("MaterialService")
+local player = Players.LocalPlayer
+
+pcall(function()
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "POTATO GRAPHICS",
+        Text = "FADLI MOD",
+        Duration = 10
+    })
+end)
+
+if setfpscap then
+    setfpscap(240)
+end
+
+settings().Rendering.QualityLevel = 0
+settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level04
+
+pcall(function()
+    RunService:Set3dRenderingEnabled(true)
+end)
+
+Lighting.GlobalShadows = false
+Lighting.EnvironmentDiffuseScale = 0
+Lighting.EnvironmentSpecularScale = 0
+Lighting.ShadowSoftness = 0
+Lighting.FogEnd = 9e9
+
+for _,v in ipairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect")
+    or v:IsA("SunRaysEffect")
+    or v:IsA("Atmosphere")
+    or v:IsA("Sky")
+    or v:IsA("Clouds")
+    or v:IsA("BloomEffect")
+    or v:IsA("ColorCorrectionEffect")
+    or v:IsA("DepthOfFieldEffect" )then
+                v:Destroy()  
+    end
+end
+
+MaterialService.Use2022Materials = false
+
+local function GOD_POTATO(v)
+    if v:IsDescendantOf(player:WaitForChild("PlayerGui")) then return end
+    if v:IsDescendantOf(game:GetService("CoreGui")) then return end
+
+    if v:IsA("ParticleEmitter")
+    or v:IsA("Trail")
+    or v:IsA("Smoke")
+    or v:IsA("Fire")
+    or v:IsA("Sparkles")  
+    or v:IsA("Explosion") then
+     v:Destroy()
+    end
+
+    if v:IsA("PointLight")
+    or v:IsA("SpotLight")
+    or v:IsA("SurfaceLight") then
+        v:Destroy()
+    end
+
+    if v:IsA("Decal") or v:IsA("Texture") then
+        v.Transparency = 1
+    end
+
+    if v:IsA("SurfaceAppearance") then
+        v:Destroy()
+    end
+
+    if v:IsA("SpecialMesh") then
+        v.TextureId = ""
+    end
+
+    if v:IsA("BasePart") then
+        v.Material = Enum.Material.Plastic
+        v.Reflectance = 0
+        v.CastShadow = false
+        v.Anchored = v.Anchored 
+    end
+
+    if v:IsA("MeshPart") then
+        v.RenderFidelity = Enum.RenderFidelity.Performance
+        v.TextureID = ""
+    end
+
+    if v:IsA("Shirt") then
+      v:Destroy()
+      end
+     
+    if v:IsA("Pants") then 
+      v:Destroy()
+    end
+    
+    if v:IsA("ShirtGraphic") then 
+      v:Destroy()
+    end
+    
+    if v:IsA("Accessory") 
+      v:Destroy()
+      end
+    
+    if v:IsA("Face") then v.Transparency = 1 end
+end
+
+for _,v in ipairs(game:GetDescendants()) do
+    pcall(GOD_POTATO, v)
+end
+
+game.DescendantAdded:Connect(function(v)
+    task.wait()
+    pcall(GOD_POTATO, v)
+end)
