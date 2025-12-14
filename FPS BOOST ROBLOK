@@ -1,118 +1,142 @@
+-- =========================
+-- POTATO FPS MODE (ALL IN ONE)
+-- UI + CUTSCENE + DIALOG SAFE
+-- =========================
+
 repeat task.wait() until game:IsLoaded()
 
+-- ===== INI SETTING =====
+_G.INI = {
+    FPS_CAP = 30,          -- 30 / 60 / 120
+    LOW_RENDER = true,
+    NO_SHADOW = true,
+    LOW_WATER = true,
+
+    POTATO_WORLD = true,
+    POTATO_CHARACTER = true,
+    REMOVE_EFFECT = true,
+    REMOVE_CLOTHES = true
+}
+
+-- ===== SERVICES =====
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
-local MaterialService = game:GetService("MaterialService")
-local player = Players.LocalPlayer
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+local StarterGui = game:GetService("StarterGui")
+local LocalPlayer = Players.LocalPlayer
 
 pcall(function()
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "POTATO GRAPHICS",
+    StarterGui:SetCore("SendNotification", {
+        Title = "POTATO MODE",
         Text = "FADLI MOD",
-        Duration = 10
+        Duration = 3
     })
 end)
 
-if setfpscap then
-    setfpscap(240)
+-- ===== FPS =====
+if setfpscap and _G.INI.FPS_CAP then
+    setfpscap(_G.INI.FPS_CAP)
 end
 
-settings().Rendering.QualityLevel = 0
-settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level04
+-- ===== LOW RENDER =====
+if _G.INI.LOW_RENDER then
+    settings().Rendering.QualityLevel = 0
+    settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level04
+end
 
-pcall(function()
-    RunService:Set3dRenderingEnabled(true)
-end)
+-- ===== NO SHADOW =====
+if _G.INI.NO_SHADOW then
+    Lighting.GlobalShadows = false
+    Lighting.ShadowSoftness = 0
+    Lighting.FogEnd = 9e9
+end
 
-Lighting.GlobalShadows = false
-Lighting.EnvironmentDiffuseScale = 0
-Lighting.EnvironmentSpecularScale = 0
-Lighting.ShadowSoftness = 0
-Lighting.FogEnd = 9e9
+-- ===== LOW WATER =====
+if Terrain and _G.INI.LOW_WATER then
+    Terrain.WaterWaveSize = 0
+    Terrain.WaterWaveSpeed = 0
+    Terrain.WaterReflectance = 0
+    Terrain.WaterTransparency = 0
+end
 
-for _,v in ipairs(Lighting:GetChildren()) do
-            if v:IsA("PostEffect")
-    or v:IsA("SunRaysEffect")
-    or v:IsA("Atmosphere")
-    or v:IsA("Sky")
-    or v:IsA("Clouds")
-    or v:IsA("BloomEffect")
-    or v:IsA("ColorCorrectionEffect")
-    or v:IsA("DepthOfFieldEffect" )then
-                v:Destroy()  
+-- ===== SAFE CHECK =====
+local function UISafe(inst)
+    return inst:IsDescendantOf(LocalPlayer:WaitForChild("PlayerGui"))
+        or inst:IsA("ScreenGui")
+        or inst:IsA("BillboardGui")
+        or inst:IsA("SurfaceGui")
+end
+
+local function CutsceneSafe(inst)
+    return inst:IsA("Camera")
+        or inst:IsA("Animation")
+        or inst:IsA("Animator")
+end
+
+-- ===== POTATO CORE =====
+local function Potato(inst)
+    if UISafe(inst) or CutsceneSafe(inst) then return end
+
+    -- REMOVE EFFECT
+    if _G.INI.REMOVE_EFFECT then
+        if inst:IsA("ParticleEmitter")
+        or inst:IsA("Trail")
+        or inst:IsA("Smoke")
+        or inst:IsA("Fire")
+        or inst:IsA("Sparkles")
+        or inst:IsA("Explosion")
+        or inst:IsA("PostEffect") then
+            inst:Destroy()
+            return
+        end
+    end
+
+    -- REMOVE CLOTHES / SKIN
+    if _G.INI.REMOVE_CLOTHES then
+        if inst:IsA("Shirt")
+        or inst:IsA("Pants")
+        or inst:IsA("ShirtGraphic")
+        or inst:IsA("Accessory")
+        or inst:IsA("Hat")
+        or inst:IsA("Face")
+        or inst:IsA("SurfaceAppearance") then
+            inst:Destroy()
+            return
+        end
+    end
+
+    -- TEXTURE POTATO
+    if inst:IsA("Decal") or inst:IsA("Texture") then
+        inst.Texture = ""
+    end
+
+    if inst:IsA("SpecialMesh") then
+        inst.MeshId = ""
+        inst.TextureId = ""
+    end
+
+    -- PART / NPC / CHARACTER POTATO
+    if inst:IsA("BasePart") then
+        inst.Material = Enum.Material.Plastic
+        inst.Reflectance = 0
+    end
+
+    if inst:IsA("MeshPart") then
+        inst.Material = Enum.Material.Plastic
+        inst.Reflectance = 0
+        inst.TextureID = ""
+        inst.RenderFidelity = 0
     end
 end
 
-MaterialService.Use2022Materials = false
-
-local function GOD_POTATO(v)
-    if v:IsDescendantOf(player:WaitForChild("PlayerGui")) then return end
-    if v:IsDescendantOf(game:GetService("CoreGui")) then return end
-
-    if v:IsA("ParticleEmitter")
-    or v:IsA("Trail")
-    or v:IsA("Smoke")
-    or v:IsA("Fire")
-    or v:IsA("Sparkles")  
-    or v:IsA("Explosion") then
-     v:Destroy()
-    end
-
-    if v:IsA("PointLight")
-    or v:IsA("SpotLight")
-    or v:IsA("SurfaceLight") then
-        v:Destroy()
-    end
-
-    if v:IsA("Decal") or v:IsA("Texture") then
-        v.Transparency = 1
-    end
-
-    if v:IsA("SurfaceAppearance") then
-        v:Destroy()
-    end
-
-    if v:IsA("SpecialMesh") then
-        v.TextureId = ""
-    end
-
-    if v:IsA("BasePart") then
-        v.Material = Enum.Material.Plastic
-        v.Reflectance = 0
-        v.CastShadow = false
-        v.Anchored = v.Anchored 
-    end
-
-    if v:IsA("MeshPart") then
-        v.RenderFidelity = Enum.RenderFidelity.Performance
-        v.TextureID = ""
-    end
-
-    if v:IsA("Shirt") then
-      v:Destroy()
-      end
-     
-    if v:IsA("Pants") then 
-      v:Destroy()
-    end
-    
-    if v:IsA("ShirtGraphic") then 
-      v:Destroy()
-    end
-    
-    if v:IsA("Accessory") 
-      v:Destroy()
-      end
-    
-    if v:IsA("Face") then v.Transparency = 1 end
-end
-
-for _,v in ipairs(game:GetDescendants()) do
-    pcall(GOD_POTATO, v)
+-- ===== APPLY =====
+for _, v in ipairs(game:GetDescendants()) do
+    pcall(Potato, v)
 end
 
 game.DescendantAdded:Connect(function(v)
-    task.wait()
-    pcall(GOD_POTATO, v)
+    task.wait(0.2)
+    pcall(Potato, v)
 end)
+
+warn("POTATO FPS MODE LOADED (ALL IN ONE)")
